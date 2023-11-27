@@ -14,7 +14,6 @@ class NewsRepositoryImpl @Inject constructor(
         safeApiCall {
             api.getBreakingNews(category = category)
         }
-
     override suspend fun searchForNews(query: String): Flow<ApiState<ResponseNews>> = safeApiCall {
         api.searchForNews(query = query)
     }
