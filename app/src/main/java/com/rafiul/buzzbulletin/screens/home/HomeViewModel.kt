@@ -10,6 +10,7 @@ import com.rafiul.buzzbulletin.remote.NewsRepositoryImpl
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -17,25 +18,21 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(private val repository: NewsRepositoryImpl) : ViewModel() {
 
-    private val _newsViewState = MutableStateFlow(NewsState())
-    val userViewState: StateFlow<NewsState> = _newsViewState
+    private val _newsViewState: MutableStateFlow<ApiState<ResponseNews>> =
+        MutableStateFlow(ApiState.Loading)
+    val newsViewState: StateFlow<ApiState<ResponseNews>> = _newsViewState
 
     init {
-        viewModelScope.launch {
-            repository.getBreakingNews("Sports").map { state ->
-                when (state) {
-                    is ApiState.Failure -> {}
-                    ApiState.Loading -> {}
-                    is ApiState.Success -> {
-                        _newsViewState.value.data = state.data
-                    }
-                }
+        getNews()
+    }
 
+    private fun getNews() {
+        viewModelScope.launch {
+            repository.getBreakingNews("Sports").collectLatest { newsApiState ->
+                _newsViewState.value = newsApiState
             }
         }
     }
 }
 
-data class NewsState(
-    var data: ResponseNews = ResponseNews(emptyList(), "", 0)
-)
+

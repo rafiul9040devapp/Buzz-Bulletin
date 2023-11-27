@@ -9,7 +9,7 @@ class AuthInterceptor @Inject constructor() : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
 
         val request = chain.request().newBuilder().also {
-            it.addHeader("apiKey", API_KEY)
+            it.addHeader("x-api-key", API_KEY)
         }
 
         return chain.proceed(request.build())

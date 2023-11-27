@@ -78,7 +78,7 @@ dependencies {
 
     val hiltVersion = "2.48"
     implementation("com.google.dagger:hilt-android:2.48.1")
-    implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
+    implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
     kapt("com.google.dagger:hilt-compiler:$hiltVersion")
 
 
@@ -90,6 +90,7 @@ dependencies {
     val retrofitVersion = "2.9.0"
     implementation("com.squareup.retrofit2:retrofit:$retrofitVersion")
     implementation("com.squareup.retrofit2:converter-gson:$retrofitVersion")
+    implementation ("com.google.code.gson:gson:2.10.1")
 
     val roomVersion = "2.6.0"
     implementation ("androidx.room:room-runtime:$roomVersion")
