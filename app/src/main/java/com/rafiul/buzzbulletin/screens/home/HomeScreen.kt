@@ -33,7 +33,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.rafiul.buzzbulletin.base.ApiState
-import com.rafiul.buzzbulletin.models.Article
+import com.rafiul.buzzbulletin.widgets.NewRowComponent
 import kotlinx.coroutines.launch
 
 
@@ -87,8 +87,6 @@ fun HomeScreen(navController: NavController, viewmodel: HomeViewModel) {
         Column(
             modifier = Modifier.padding(paddingValues)
         ) {
-
-
             VerticalPager(
                 state = pagerState,
                 modifier = Modifier.fillMaxSize(),
@@ -114,20 +112,8 @@ fun HomeScreen(navController: NavController, viewmodel: HomeViewModel) {
                         val responseNews = (news.value as ApiState.Success).data
 
                         responseNews.articles?.getOrNull(page)?.let { NewRowComponent(page, it) }
-
-
-//                        val listSize = responseNews.articles?.size?.minus(1)
-//                        if (responseNews.articles?.isNotEmpty() == true) {
-//                            if (page <= (listSize ?: 0)) {
-//                                responseNews.articles[page]?.let { NewRowComponent(page, it) }
-//                            } else {
-//                                userScrollable.value = false
-//                            }
-//                        }
                     }
                 }
-
-
                 if (page == (news.value as? ApiState.Success)?.data?.articles?.size?.minus(1)) {
                     val coroutineScope = rememberCoroutineScope()
                     Button(onClick = {
@@ -144,11 +130,4 @@ fun HomeScreen(navController: NavController, viewmodel: HomeViewModel) {
     }
 }
 
-@Composable
-fun NewRowComponent(page: Int, article: Article?) {
-
-    if (article != null) {
-        article.title?.let { Text(text = it) }
-    }
-}
 
