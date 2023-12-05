@@ -21,14 +21,14 @@ class HomeViewModel @Inject constructor(private val repository: NewsRepositoryIm
     private val _newsViewState: MutableStateFlow<ApiState<ResponseNews>> =
         MutableStateFlow(ApiState.Loading)
     val newsViewState: StateFlow<ApiState<ResponseNews>> = _newsViewState
+//
+//    init {
+//        getNews(category)
+//    }
 
-    init {
-        getNews()
-    }
-
-    private fun getNews() {
+     fun getNews(category:String) {
         viewModelScope.launch {
-            repository.getBreakingNews("Sports").collectLatest { newsApiState ->
+            repository.getBreakingNews(category).collectLatest { newsApiState ->
                 _newsViewState.value = newsApiState
             }
         }
