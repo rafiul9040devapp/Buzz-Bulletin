@@ -108,9 +108,8 @@ dependencies {
     implementation("androidx.paging:paging-compose:3.3.0-alpha02")
 
     implementation("io.coil-kt:coil-compose:2.5.0")
-
-
     implementation("androidx.compose.material:material-icons-extended-android:1.5.4")
+    implementation ("androidx.core:core-splashscreen:1.0.1")
 }
 
 kapt {

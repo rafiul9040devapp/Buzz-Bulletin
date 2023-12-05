@@ -106,7 +106,7 @@ fun NewRowComponent(page: Int, article: Article) {
                     text = (page + 1).toString(),
                     style = MaterialTheme.typography.bodyMedium,
                     fontFamily = FontFamily.SansSerif,
-                    color = Color.White,
+                    color = Color.Black,
                     textAlign = TextAlign.Center
                 )
             }

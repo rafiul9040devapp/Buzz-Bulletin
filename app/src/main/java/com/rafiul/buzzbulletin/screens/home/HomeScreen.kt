@@ -16,8 +16,6 @@ import androidx.compose.foundation.pager.PageSize
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -87,16 +85,13 @@ fun HomeScreen(navController: NavController, viewmodel: HomeViewModel) {
 
     LaunchedEffect(selectedTabIndex) {
         viewmodel.getNews(tabItemList[selectedTabIndex].title)
-        delay(2000L)
         pagerStateHorizontal.animateScrollToPage(selectedTabIndex)
     }
 
     LaunchedEffect(pagerStateHorizontal.currentPage, pagerStateHorizontal.isScrollInProgress) {
-
         if (!pagerStateHorizontal.isScrollInProgress) {
             selectedTabIndex = pagerStateHorizontal.currentPage
         }
-
     }
 
     LaunchedEffect(pagerStateVertical) {
@@ -120,11 +115,12 @@ fun HomeScreen(navController: NavController, viewmodel: HomeViewModel) {
                         text = "Buzz Bulletin",
                         textAlign = TextAlign.Justify,
                         style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.Light
+                        fontWeight = FontWeight.Light,
+                        color = Color.White
                     )
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
+                    containerColor = MaterialTheme.colorScheme.background,
                     scrolledContainerColor = MaterialTheme.colorScheme.onBackground,
                 ),
                 scrollBehavior = scrollBehavior
