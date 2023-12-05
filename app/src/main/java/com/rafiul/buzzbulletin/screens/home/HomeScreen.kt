@@ -10,15 +10,18 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PageSize
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material3.Button
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -41,6 +44,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.font.FontWeight
@@ -49,8 +53,10 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.rafiul.buzzbulletin.base.ApiState
 import com.rafiul.buzzbulletin.widgets.NewRowComponent
+import com.rafiul.buzzbulletin.widgets.ProgressBar
 import com.rafiul.buzzbulletin.widgets.TabItem
 import com.rafiul.buzzbulletin.widgets.tabItemList
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
@@ -68,14 +74,20 @@ fun HomeScreen(navController: NavController, viewmodel: HomeViewModel) {
         mutableIntStateOf(0)
     }
 
-
     val pagerStateHorizontal = rememberPagerState {
         tabItemList.size
     }
 
 
+    //need to make the PAGE COUNT DYNAMIC
+    val pagerStateVertical = rememberPagerState(initialPage = 0, initialPageOffsetFraction = 0f) {
+        20
+    }
+
+
     LaunchedEffect(selectedTabIndex) {
         viewmodel.getNews(tabItemList[selectedTabIndex].title)
+        delay(2000L)
         pagerStateHorizontal.animateScrollToPage(selectedTabIndex)
     }
 
@@ -85,10 +97,6 @@ fun HomeScreen(navController: NavController, viewmodel: HomeViewModel) {
             selectedTabIndex = pagerStateHorizontal.currentPage
         }
 
-    }
-
-    val pagerStateVertical = rememberPagerState(initialPage = 0, initialPageOffsetFraction = 0f) {
-        100
     }
 
     LaunchedEffect(pagerStateVertical) {
@@ -109,14 +117,14 @@ fun HomeScreen(navController: NavController, viewmodel: HomeViewModel) {
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = "News",
+                        text = "Buzz Bulletin",
                         textAlign = TextAlign.Justify,
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Light
                     )
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
+                    containerColor = MaterialTheme.colorScheme.primary,
                     scrolledContainerColor = MaterialTheme.colorScheme.onBackground,
                 ),
                 scrollBehavior = scrollBehavior
@@ -179,15 +187,19 @@ fun HomeScreen(navController: NavController, viewmodel: HomeViewModel) {
                     .weight(1f)
             ) { page ->
                 Box(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .wrapContentSize()
+                        .background(color = Color.Transparent)
+                        .clip(shape = RoundedCornerShape(size = 15.dp))
+                        .padding(all = 8.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     VerticalPager(
                         state = pagerStateVertical,
                         modifier = Modifier.fillMaxSize(),
                         pageSize = PageSize.Fill,
-                        pageSpacing = 8.dp,
-                        userScrollEnabled = userScrollable.value
+                        pageSpacing = 10.dp,
+                        userScrollEnabled = userScrollable.value && pagerStateVertical.currentPage < pagerStateVertical.pageCount - 1,
                     ) { page ->
                         when (news.value) {
 
@@ -199,25 +211,41 @@ fun HomeScreen(navController: NavController, viewmodel: HomeViewModel) {
 
                             ApiState.Loading -> {
                                 Log.d(TAG, "Loading.....")
-                                CircularProgressIndicator()
-
+                                ProgressBar()
                             }
 
                             is ApiState.Success -> {
                                 val responseNews = (news.value as ApiState.Success).data
 
-                                responseNews.articles?.getOrNull(page)?.let { NewRowComponent(page, it) }
-                            }
-                        }
-                        if (page == (news.value as? ApiState.Success)?.data?.articles?.size?.minus(1)) {
-                            val coroutineScope = rememberCoroutineScope()
-                            Button(onClick = {
-                                coroutineScope.launch {
-                                    userScrollable.value = true
-                                    pagerStateVertical.animateScrollToPage(-1)
+                                if (page == (news.value as? ApiState.Success)?.data?.articles?.size?.minus(
+                                        1
+                                    )
+                                ) {
+                                    val coroutineScope = rememberCoroutineScope()
+                                    FloatingActionButton(
+                                        onClick = {
+                                            coroutineScope.launch {
+                                                userScrollable.value = true
+                                                pagerStateVertical.animateScrollToPage(-1)
+                                            }
+                                        },
+                                        containerColor = MaterialTheme.colorScheme.secondary,
+                                        contentColor = Color.Green
+                                    ) {
+                                        Text(
+                                            text = "Scroll to Top",
+                                            color = Color.Green,
+                                            style = MaterialTheme.typography.bodyLarge,
+                                            fontWeight = FontWeight.Bold
+                                        )
+//                                        Icon(
+//                                            imageVector = Icons.Filled.ArrowUpward,
+//                                            contentDescription = "Scroll To Top"
+//                                        )
+                                    }
                                 }
-                            }) {
-                                Text(text = "Scroll to Top", color = Color.White)
+                                responseNews.articles?.getOrNull(page)
+                                    ?.let { NewRowComponent(page, it) }
                             }
                         }
                     }
